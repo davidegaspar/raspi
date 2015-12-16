@@ -3,7 +3,7 @@
 ## setting wifi up via the command line
 https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
 
-## static ip (review)
+## static ip `<-- needs review`
 ```
 $ sudo ifconfig
 $ netstat -nr
