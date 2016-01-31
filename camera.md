@@ -7,69 +7,86 @@ https://www.raspberrypi.org/documentation/usage/camera/README.md
 https://www.raspberrypi.org/documentation/usage/camera/raspicam/README.md
 
 ## motion
+
 #### install
+
 ```
-$ sudo apt-get install motion
-$ sudo apt-get install libjpeg62 libjpeg62-dev libavformat-dev libavcodec-dev libavutil-dev libc6-dev zlib1g-dev libmysqlclient-dev libpq-dev
-$ mkdir mmal
-$ cd mmal
-$ wget https://www.dropbox.com/s/jw5r1wss32tdibb/motion-mmal-opt.tar.gz
-$ tar -zxvf motion-mmal-opt.tar.gz
-$ cd motion-mmal
-$ sudo nano motion-mmalcam.conf
+sudo apt-get install motion
+sudo apt-get install libjpeg62
 ```
-#### config `<-- stopped here`
+
+#### download, extract and move
+
 ```
+wget https://www.dropbox.com/s/jw5r1wss32tdibb/motion-mmal-opt.tar.gz
+tar zxvf motion-mmal-opt.tar.gz
+sudo mv motion-mmal/motion /usr/bin/motion
+sudo mv motion-mmal/motion-mmalcam.conf /etc/motion.conf
+```
+
+#### enable daemon
+
+```
+sudo nano /etc/default/motion
+```
+
+```
+start_motion_daemon=yes
+```
+
+#### edit config
+
+```
+sudo nano /etc/motion.conf
+```
+
+```
+daemon on
+logfile /tmp/motion.log
 width 640
 height 480
-framerate 6
-target_dir /home/pi/cam
+framerate 5
+pre_capture 5
+post_capture 5
+max_movie_time 600
 output_pictures off
-text_left Pi-cam %t
-logfile  /home/pi/mmal/motion.log
 ffmpeg_output_movies on
-```
-#### run
-```
-$ ./motion-mmal -n -c motion-mmalcam.conf
-```
-#### run new
-```
-sudo scp davidegaspar@192.168.1.90:/Users/davidegaspar/motionx.conf montionx3.conf
-sudo ./motionx -n -c motionx.conf
+text_left CAMERA %t
+target_dir /home/pi/cam
 ```
 
-#### startup
-```
-sudo cp /home/cookie/sd/camx/mx.conf /etc/motion.conf
-sudo cp /home/cookie/sd/camx/motionx /usr/bin/motion
-sudo nano /etc/default/motion
-sudo touch /tmp/motion.log
-sudo chmod 775 /tmp/motion.log
-```
-> logfile /tmp/motion.log
+#### permissions
 
-#### fix permissions so the group user can access the cam folder and the log
 ```
-sudo scp davidegaspar@192.168.1.90:/Users/davidegaspar/motionx.conf /etc/motion.conf
-sudo usermod -a -G motion cookie
-sudo chmod 664 /tmp/motion.log
-sudo chgrp motion /home/cookie/sd/cam
-sudo chmod 775 sd/cam
+-rw-r--r-- 1 pi pi 29904 Jan 31 18:17 /etc/motion.conf
+-rwxr-xr-x 1 pi pi 320267 May 10  2014 /usr/bin/motion
+-rw-r--r-- 1 motion motion 55770 Jan 31 18:48 /tmp/motion.log
+drwxrwxr-x 2 pi motion   4096 Jan 31 18:48 /home/pi/cam
 ```
+
+#### start/stop
+
+```
+sudo service motion start
+tail -f /tmp/motion.log
+sudo service motion start
+```
+
+#### live
+go to http://pi.ip.address:8081 in the browser
 
 #### clean log
 ```
 sudo cat /dev/null > /tmp/motion.log
 ```
 
-#### start stop daemon
+## disable led
 ```
-sudo /etc/init.d/motion start
-sudo /etc/init.d/motion stop
+sudo nano /boot/config.txt:
+disable_camera_led=1
 ```
 
-## cron
+## cron (review)
 ```
 $ crontab -e
 ```
@@ -84,11 +101,7 @@ $ crontab -e
 */5 * * * * /etc/init.d/motion restart &>> /home/cookie/sd/cam/cam.log
 ```
 
-#### docs
-http://www.lavrsen.dk/foswiki/bin/view/Motion/ConfigFileOptions
-
-
-## stream
+## stream (review)
 http://www.raspberry-projects.com/pi/pi-hardware/raspberry-pi-camera/streaming-video-using-vlc-player
 ```
 sudo apt-get install vlc
@@ -104,6 +117,8 @@ sudo nc -l 5001 | mplayer -fps 12 -cache 1024 -
 sudo raspivid -vf -hf -w 600 -h 400 -fps 12 -t 999999 -o - | nc 192.168.1.90 5001
 ```
 
-## other tutorials
+## references
 http://www.instructables.com/id/Raspberry-Pi-as-low-cost-HD-surveillance-camera/?ALLSTEPS
 https://rbnrpi.wordpress.com/project-list/setting-up-wireless-motion-detect-cam/
+https://github.com/dozencrows/motion/tree/mmal-test
+https://medium.com/@Cvrsor/how-to-make-a-diy-home-alarm-system-with-a-raspberry-pi-and-a-webcam-2d5a2d61da3d#.g9sflspsl
