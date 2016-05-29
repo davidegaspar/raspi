@@ -1,0 +1,3 @@
+- name: start cam
+  command: service motion start
+  become: True

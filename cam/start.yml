@@ -1,0 +1,5 @@
+- hosts: pi
+  gather_facts: False
+
+  roles:
+    - start

@@ -1,0 +1,15 @@
+- name: tar videos
+  command: tar -cvzf cam.tgz cam
+
+- name: fetch tar
+  fetch: src=/home/pi/cam.tgz dest=~/tmp/raspi/ flat=yes fail_on_missing=yes
+
+- name: clean tar
+  file: path=/home/pi/cam.tgz state=absent
+
+- name: clean videos
+  file: path=/home/pi/cam state=absent
+
+- name: create videos dir
+  file: path=/home/pi/cam state=directory owner=pi group=motion mode=775
+  become: True

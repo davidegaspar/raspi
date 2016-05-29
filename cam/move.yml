@@ -1,0 +1,7 @@
+- hosts: pi
+  gather_facts: False
+
+  roles:
+    - stop
+    - move
+    # - halt
