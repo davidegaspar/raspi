@@ -4,4 +4,4 @@
   roles:
     - stop
     - move
-    # - halt
+    - halt
