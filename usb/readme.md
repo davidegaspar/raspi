@@ -14,3 +14,10 @@ modules-load=dwc2,g_ether
 ```
 
 ! cant connect to macOS
+
+# ic2 enable (maybe?)
+```
+dtparam=i2c1=on
+dtparam=i2c_arm=on
+```
+for now just use `raspi-config`
