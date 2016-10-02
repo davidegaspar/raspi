@@ -40,7 +40,7 @@ class CaptureHandler:
             # self.camera.stop_preview()
 
             # video
-            os.makedirs('captures')
+            #os.makedirs('captures')
             self.camera.start_recording('captures/video-%s.h264' % datetime.datetime.now().isoformat(), use_video_port=True)
             time.sleep(15)
             self.camera.stop_recording()
