@@ -41,9 +41,9 @@ class CaptureHandler:
 
             # video
             os.makedirs('captures')
-            camera.start_recording('captures/video-%s.h264' % datetime.datetime.now().isoformat())
-            sleep(15)
-            camera.stop_recording()
+            self.camera.start_recording('captures/video-%s.h264' % datetime.datetime.now().isoformat())
+            time.sleep(15)
+            self.camera.stop_recording()
 
             # print "Generating the montage"
             # montage_file = path + 'montage.jpg'
