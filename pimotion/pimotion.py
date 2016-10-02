@@ -35,8 +35,8 @@ class CaptureHandler:
 
             self.camera.start_preview()
 
-            for x in range(1, 16):
-                filename = "detected-%02d.jpg" % x
+            for x in range(1, 150):
+                filename = "frame-%02d.jpg" % x
                 self.camera.capture(path + filename, use_video_port=True)
                 print "Captured " + filename
 
@@ -48,8 +48,8 @@ class CaptureHandler:
 
             print "Finished capturing"
 
-            if self.callback:
-                self.callback(montage_file)
+            # if self.callback:
+            #     self.callback(montage_file)
 
             self.working = False
 
@@ -101,7 +101,7 @@ class PiMotion:
 
                 while True:
                     handler.tick()
-                    time.sleep(1)
+                    time.sleep(0.250)
             finally:
                 camera.stop_recording()
                 self.__print('Stopped recording')
