@@ -29,18 +29,21 @@ class CaptureHandler:
             self.detected = False
             self.i += 1
 
-            path = "captures/%s/" % datetime.datetime.now().isoformat()
+            # stills
+            # path = "captures/%s/" % datetime.datetime.now().isoformat()
+            # os.makedirs(path)
+            # self.camera.start_preview()
+            # for x in range(1, 150):
+            #     filename = "frame-%02d.jpg" % x
+            #     self.camera.capture(path + filename, use_video_port=True)
+            #     print "Captured " + filename
+            # self.camera.stop_preview()
 
-            os.makedirs(path)
-
-            self.camera.start_preview()
-
-            for x in range(1, 150):
-                filename = "frame-%02d.jpg" % x
-                self.camera.capture(path + filename, use_video_port=True)
-                print "Captured " + filename
-
-            self.camera.stop_preview()
+            # video
+            os.makedirs('captures')
+            camera.start_recording('captures/video-%s.h264' % datetime.datetime.now().isoformat())
+            sleep(15)
+            camera.stop_recording()
 
             # print "Generating the montage"
             # montage_file = path + 'montage.jpg'
