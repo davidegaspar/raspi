@@ -41,9 +41,9 @@ class CaptureHandler:
 
             # video
             #os.makedirs('captures')
-            self.camera.start_recording('captures/video-%s.h264' % datetime.datetime.now().isoformat(), use_video_port=True)
-            time.sleep(15)
-            self.camera.stop_recording()
+            # self.camera.start_recording('captures/video-%s.h264' % datetime.datetime.now().isoformat(), use_video_port=True)
+            # time.sleep(15)
+            # self.camera.stop_recording()
 
             # print "Generating the montage"
             # montage_file = path + 'montage.jpg'
@@ -103,6 +103,7 @@ class PiMotion:
                 )
 
                 while True:
+                    self.__print('while true')
                     handler.tick()
                     time.sleep(0.250)
             finally:
