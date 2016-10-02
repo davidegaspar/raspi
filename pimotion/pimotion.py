@@ -42,9 +42,9 @@ class CaptureHandler:
 
             self.camera.stop_preview()
 
-            print "Generating the montage"
-            montage_file = path + 'montage.jpg'
-            subprocess.call("montage -border 0 -background none -geometry 240x180 " + path + "* " + montage_file, shell=True)
+            # print "Generating the montage"
+            # montage_file = path + 'montage.jpg'
+            # subprocess.call("montage -border 0 -background none -geometry 240x180 " + path + "* " + montage_file, shell=True)
 
             print "Finished capturing"
 
