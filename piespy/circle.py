@@ -13,6 +13,7 @@ try:
     while True:
         camera.wait_recording(1)
         if motion_detected():
+            print "motion_detected"
             # Keep recording for 10 seconds and only then write the
             # stream to disk
             camera.wait_recording(10)
