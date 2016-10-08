@@ -17,9 +17,9 @@ class DetectMotion(picamera.array.PiMotionAnalysis):
             print camera
             print stream
             camera.wait_recording(5) # Keep recording for 10 seconds
-            # print('saving...')
-            # stream.copy_to('motion-%s.h264' % datetime.datetime.now().isoformat())
-            # print('saved!')
+            print('saving...')
+            stream.copy_to('motion-%s.h264' % datetime.datetime.now().isoformat())
+            print('saved!')
 
 with picamera.PiCamera() as camera:
     with picamera.PiCameraCircularIO(camera, seconds=20) as stream:
