@@ -13,19 +13,19 @@ class DetectMotion(picamera.array.PiMotionAnalysis):
             np.square(a['x'].astype(np.float)) +
             np.square(a['y'].astype(np.float))
             ).clip(0, 255).astype(np.uint8)
-        # If there're more than 10 vectors with a magnitude greater
-        # than 60, then say we've detected motion
-        if (a > 60).sum() > 10:
-            print('motion %s' % datetime.datetime.now().isoformat())
-            camera.wait_recording(5) # Keep recording for 10 seconds
-            print('saving...')
+        if (a > 60).sum() > 10:# If there're more than 10 vectors with a magnitude greater than 60, then say we've detected motion
+            print('motion-%s' % datetime.datetime.now().isoformat())
+            camera.wait_recording(10) # Keep recording for 10 seconds
             self.stream.copy_to('motion-%s.h264' % datetime.datetime.now().isoformat())
             print('saved!')
 
-with picamera.PiCamera() as camera:
-    with picamera.PiCameraCircularIO(camera, seconds=20) as stream:
-        # with DetectMotion(camera) as output:
-        camera.resolution = (640, 480)
-        camera.start_recording(stream, format='h264', motion_output=DetectMotion(camera, stream))
-        camera.wait_recording(15)
-        camera.stop_recording()
+camera = picamera.PiCamera()
+stream = picamera.PiCameraCircularIO(camera, seconds=20)
+camera.resolution = (640, 480)
+camera.start_recording(stream, format='h264', motion_output=DetectMotion(camera, stream))
+
+try:
+    while True:
+        camera.wait_recording(1)
+finally:
+    camera.stop_recording()
