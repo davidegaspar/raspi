@@ -5,24 +5,19 @@ import picamera
 import picamera.array
 
 class DetectMotion(picamera.array.PiMotionAnalysis):
-    # def __init__(self, camera):
-    #     super(DetectMotion, self).__init__(camera)
-
     def analyze(self, a):
-        print camera
-        print stream
-        # a = np.sqrt(
-        #     np.square(a['x'].astype(np.float)) +
-        #     np.square(a['y'].astype(np.float))
-        #     ).clip(0, 255).astype(np.uint8)
-        # # If there're more than 10 vectors with a magnitude greater
-        # # than 60, then say we've detected motion
-        # if (a > 60).sum() > 10:
-        #     print('motion')
-        #     camera.wait_recording(10) # Keep recording for 10 seconds
-        #     print('saving...')
-        #     stream.copy_to('motion-%s.h264' % datetime.datetime.now().isoformat())
-        #     print('saved!')
+        a = np.sqrt(
+            np.square(a['x'].astype(np.float)) +
+            np.square(a['y'].astype(np.float))
+            ).clip(0, 255).astype(np.uint8)
+        # If there're more than 10 vectors with a magnitude greater
+        # than 60, then say we've detected motion
+        if (a > 60).sum() > 10:
+            print('motion')
+            # camera.wait_recording(10) # Keep recording for 10 seconds
+            # print('saving...')
+            # stream.copy_to('motion-%s.h264' % datetime.datetime.now().isoformat())
+            # print('saved!')
 
 with picamera.PiCamera() as camera:
     with picamera.PiCameraCircularIO(camera, seconds=20) as stream:
