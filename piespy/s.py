@@ -5,8 +5,8 @@ import picamera
 import picamera.array
 
 class DetectMotion(picamera.array.PiMotionAnalysis):
-    def __init__(self, camera):
-        super(DetectMotion, self).__init__(camera)
+    # def __init__(self, camera):
+    #     super(DetectMotion, self).__init__(camera)
 
     def analyze(self, a):
         a = np.sqrt(
@@ -26,6 +26,6 @@ with picamera.PiCamera() as camera:
     with picamera.PiCameraCircularIO(camera, seconds=20) as stream:
         with DetectMotion(camera) as output:
             camera.resolution = (640, 480)
-            camera.start_recording(stream, format='h264', motion_output=output(camera))
+            camera.start_recording(stream, format='h264', motion_output=output)
             # camera.wait_recording(30)
             # camera.stop_recording()
