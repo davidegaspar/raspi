@@ -13,7 +13,7 @@ class DetectMotion(picamera.array.PiMotionAnalysis):
         # If there're more than 10 vectors with a magnitude greater
         # than 60, then say we've detected motion
         if (a > 60).sum() > 10:
-            print('motion %s' % datetime.datetime.now().isoformat()))
+            print('motion %s' % datetime.datetime.now().isoformat())
             # camera.wait_recording(10) # Keep recording for 10 seconds
             # print('saving...')
             # stream.copy_to('motion-%s.h264' % datetime.datetime.now().isoformat())
