@@ -2,7 +2,7 @@ import io
 import datetime
 import numpy as np
 import picamera
-import picamera.arrays
+import picamera.array
 
 class DetectMotion(picamera.array.PiMotionAnalysis):
     def __init__(self, camera):
