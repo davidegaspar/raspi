@@ -27,7 +27,8 @@ class DetectMotion(picamera.array.PiMotionAnalysis):
 
 camera = picamera.PiCamera()
 stream = picamera.PiCameraCircularIO(camera, seconds=20)
-camera.resolution = (640, 480)
+camera.resolution = (1280, 720)
+camera.rotation = 180
 camera.start_recording(stream, format='h264', motion_output=DetectMotion(camera, stream))
 
 try:

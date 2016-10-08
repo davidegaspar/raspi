@@ -15,7 +15,8 @@ class DetectMotion(picamera.array.PiMotionAnalysis):
 
 with picamera.PiCamera() as camera:
     with DetectMotion(camera) as output:
-        camera.resolution = (640, 480)
+        camera.resolution = (1280, 720)
+        camera.rotation = 180
         camera.start_recording(
               '/dev/null', format='h264', motion_output=output)
         camera.wait_recording(30)
