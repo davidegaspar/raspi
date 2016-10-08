@@ -21,7 +21,7 @@ class DetectMotion(picamera.array.PiMotionAnalysis):
 
 with picamera.PiCamera() as camera:
     with picamera.PiCameraCircularIO(camera, seconds=20) as stream:
-        # with DetectMotion(camera) as output:
+        with DetectMotion(camera) as output:
             print camera
             print stream
             camera.resolution = (640, 480)
