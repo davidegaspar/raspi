@@ -3,7 +3,8 @@ import time
 import picamera
 
 camera = picamera.PiCamera()
-camera.resolution = (640, 480)
+camera.resolution = (1280, 720)
+camera.rotation = 180
 camera.framerate = 24
 
 server_socket = socket.socket()
