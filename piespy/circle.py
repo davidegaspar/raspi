@@ -14,7 +14,7 @@ try:
     while count:
         camera.wait_recording(1)
         if motion_detected():
-            count--
+            count -= 1
             print "start %02d" % count
              and only then write the
             camera.wait_recording(10) # Keep recording for 10 seconds
