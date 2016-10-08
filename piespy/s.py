@@ -5,8 +5,6 @@ import numpy as np
 import picamera
 import picamera.arrays
 
-self.camera.start_recording('captures/video-%s.h264' % , use_video_port=True)
-
 class DetectMotion(picamera.array.PiMotionAnalysis):
     def __init__(self, camera):
         super(MyMotionDetector, self).__init__(camera)
