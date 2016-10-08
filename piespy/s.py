@@ -4,11 +4,13 @@ import numpy as np
 import picamera
 import picamera.array
 
-# class DetectMotion(picamera.array.PiMotionAnalysis):
+class DetectMotion(picamera.array.PiMotionAnalysis):
     # def __init__(self, camera):
     #     super(DetectMotion, self).__init__(camera)
 
-    # def analyze(self, a):
+    def analyze(self, a):
+        print camera
+        print stream
         # a = np.sqrt(
         #     np.square(a['x'].astype(np.float)) +
         #     np.square(a['y'].astype(np.float))
