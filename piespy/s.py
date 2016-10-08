@@ -6,7 +6,7 @@ import picamera.array
 
 class DetectMotion(picamera.array.PiMotionAnalysis):
     def __init__(self, camera):
-        super(MyMotionDetector, self).__init__(camera)
+        super(DetectMotion, self).__init__(camera)
     def analyze(self, a):
         a = np.sqrt(
             np.square(a['x'].astype(np.float)) +
