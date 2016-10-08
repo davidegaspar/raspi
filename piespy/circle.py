@@ -9,14 +9,16 @@ def motion_detected():
 camera = picamera.PiCamera()
 stream = picamera.PiCameraCircularIO(camera, seconds=20)
 camera.start_recording(stream, format='h264')
+count = 3
 try:
-    while True:
+    while count:
         camera.wait_recording(1)
         if motion_detected():
-            print "motion_detected"
-            # Keep recording for 10 seconds and only then write the
-            # stream to disk
-            camera.wait_recording(10)
-            stream.copy_to('motion.h264')
+            count--
+            print "start %02d" % count
+             and only then write the
+            camera.wait_recording(10) # Keep recording for 10 seconds
+            stream.copy_to('motion%02d.h264' % count)
+            print "stop %02d" % count
 finally:
     camera.stop_recording()
