@@ -3,7 +3,7 @@ version: '2'
 services:
 
   app:
-    environment:
+    # environment:
     image: "piespy:1"
     container_name: "piespy"
     # ports:
