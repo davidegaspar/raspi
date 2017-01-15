@@ -1,0 +1,30 @@
+#!/bin/bash
+# /etc/init.d/spy
+
+### BEGIN INIT INFO
+# Provides:          spy
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: spy cam
+# Description:       spy picam and pir
+### END INIT INFO
+
+
+case "$1" in
+    start)
+        echo "Starting spy"
+        /home/pi/spy/s.py > /home/pi/spy/out/spy.log 2>&1 &
+        ;;
+    stop)
+        echo "Stopping spy"
+        killall python # not the best way
+        ;;
+    *)
+        echo "Usage: /etc/init.d/spy start|stop"
+        exit 1
+        ;;
+esac
+
+exit 0
