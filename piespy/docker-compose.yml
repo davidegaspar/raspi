@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+
+  app:
+    # environment:
+    image: "piespy:1"
+    container_name: "piespy"
+    # ports:
+    #   - "80:8080"
+    # volumes:
+    #   - /app/logs:/app/logs

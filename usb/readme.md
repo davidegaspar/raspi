@@ -21,3 +21,8 @@ dtparam=i2c1=on
 dtparam=i2c_arm=on
 ```
 for now just use `raspi-config`
+
+# enable ssh
+```
+touch ssh
+```
