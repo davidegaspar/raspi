@@ -43,6 +43,21 @@ https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
 raspi-config
 ```
 
+## nodejs
+https://nodejs.org/en/download/
+```
+sudo su
+cd /opt
+uname -a
+wget <url_for_armv6/7/8> -O nodejs.tar.xz
+tar -xvf nodejs.tar.xz
+ln -s /opt/nodejs/bin/node /usr/bin/node
+ln -s /opt/nodejs/bin/npm /usr/bin/npm
+node -v
+npm -v
+rm nodejs.tar.xz
+```
+
 ## docker
 ```
 # TBD
