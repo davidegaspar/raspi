@@ -58,6 +58,14 @@ npm -v
 rm nodejs.tar.xz
 ```
 
+## aws
+```
+sudo apt-get install python-pip
+sudo pip install awscli --upgrade --user
+sudo ln -s ~/.local/bin/aws /usr/bin/aws
+aws --version
+```
+
 ## docker
 ```
 # TBD
