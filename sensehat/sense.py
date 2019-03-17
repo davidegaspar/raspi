@@ -9,10 +9,10 @@ sense.clear()
 # lib
 def get_sense_data():
     sense_data = []
-    sense_data.append(sense.get_temperature_from_pressure()) # more accurate
-    sense_data.append(sense.get_pressure())
-    sense_data.append(sense.get_humidity())
     sense_data.append(datetime.now())
+    sense_data.append(round(sense.get_temperature_from_pressure(), 2)) # more accurate
+    sense_data.append(round(sense.get_pressure(), 2))
+    sense_data.append(round(sense.get_humidity(), 2))
     return sense_data
 
 # main
