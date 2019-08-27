@@ -15,14 +15,14 @@ touch ssh
 
 #### 2. enable usb access
 - **mac**
-append to `config.txt`
 ```
+echo "
 # usb access
 dtoverlay=dwc2
+" >> config.txt
 ```
-add to `cmdline.txt` after `rootwait`
 ```
-modules-load=dwc2,g_ether
+sed -i '' 's/rootwait/rootwait modules-load=dwc2,g_ether/g' cmdline.txt
 ```
 
 #### 3. connect to the pi
