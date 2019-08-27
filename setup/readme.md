@@ -69,6 +69,16 @@ sudo /etc/init.d/ssh restart # or sudo reboot
 #### 4. wifi
 https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
 
+#### 5. docker
+```
+curl -sSL https://get.docker.com | sh
+```
+
+#### 6. git
+```
+sudo apt-get install -y git
+```
+
 ## other stuff (review)
 
 #### camera
