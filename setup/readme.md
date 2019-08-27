@@ -74,6 +74,13 @@ https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
 curl -sSL https://get.docker.com | sh
 ```
 
+#### 7. docker-compose
+```
+sudo apt update
+sudo apt install -y python python-pip libffi-dev python-backports.ssl-match-hostname
+sudo pip install docker-compose
+```
+
 #### 6. git
 ```
 sudo apt-get install -y git
