@@ -76,5 +76,10 @@ curl -sSL https://get.docker.com | sh
 
 #### 6. install git
 ```
-sudo apt-get install -y git
+apt install -y git
+```
+
+#### 6. install tree
+```
+apt install tree
 ```
