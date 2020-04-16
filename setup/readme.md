@@ -43,6 +43,7 @@ pi:raspberry
 cd ~
 mkdir .ssh && chmod 700 .ssh
 touch .ssh/authorized_keys && chmod 600 .ssh/authorized_keys
+nano .ssh/authorized_keys
 ```
 
 - **mac**
@@ -51,9 +52,6 @@ pbcopy < ~/.ssh/id_rsa.pub
 ```
 
 - **pi**
-```
-nano .ssh/authorized_keys
-```
 ```
 sudo nano /etc/ssh/sshd_config
 ```
@@ -68,6 +66,9 @@ sudo /etc/init.d/ssh restart # or sudo reboot
 
 #### 4. setup wifi
 https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
+```
+sudo raspi-config
+```
 
 #### 5. install docker
 ```
