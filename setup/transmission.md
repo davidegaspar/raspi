@@ -64,6 +64,12 @@ hostname -I
 
 ## remote
 
+### web
+
+```
+open http://192.168.50.52:9091/transmission/web/
+```
+
 ### list
 
 ```
