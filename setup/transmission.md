@@ -5,6 +5,10 @@
 - https://pimylifeup.com/raspberry-pi-transmission/
 - https://help.ubuntu.com/community/TransmissionHowTo
 
+```
+sudo apt-get install transmission-cli transmission-common transmission-daemon
+```
+
 ## daemon
 
 ```
@@ -13,9 +17,9 @@ sudo apt upgrade
 sudo apt install transmission-daemon
 sudo nano /etc/transmission-daemon/settings.json
 ```
-```
-"incomplete-dir": "/home/pi/chocobo/inc",
-"download-dir": "/home/pi/chocobo/dwn",
+```json
+"download-dir": "/home/pi/.../dwn",
+"incomplete-dir": "/home/pi/.../inc",
 "incomplete-dir-enabled": true,
 "rpc-whitelist": "192.168.*.*",
 ```
@@ -63,6 +67,11 @@ hostname -I
 ```
 
 ## remote
+
+## install
+```
+sudo apt install transmission-remote
+```
 
 ### web
 
