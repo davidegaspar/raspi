@@ -76,18 +76,18 @@ sudo apt install transmission-remote
 ### web
 
 ```
-open http://192.168.50.52:9091/transmission/web/
+open http://<ip>:9091/transmission/web/
 ```
 
 ### list
 
 ```
-transmission-remote 192.168.50.52:9091 -l
+transmission-remote <ip>:9091 -l
 ```
 
 ### add
 ```
-transmission-remote 192.168.50.52:9091 -a https://nyaa.si/download/1289266.torrent
+transmission-remote <ip>:9091 -a https://nyaa.si/download/1289266.torrent
 ```
 
 ### stop
