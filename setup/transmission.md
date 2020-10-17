@@ -87,7 +87,7 @@ transmission-remote <ip>:9091 -l
 
 ### add
 ```
-transmission-remote <ip>:9091 -a https://nyaa.si/download/1289266.torrent
+transmission-remote <ip>:9091 -a https://.../download/1289266.torrent
 ```
 
 ### stop
