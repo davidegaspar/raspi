@@ -15,8 +15,8 @@ touch /etc/openvpn/credentials
 printf '%s\n' 'username' 'password' > /etc/openvpn/credentials
 vi /etc/openvpn/credentials
 # download linux file from https://member.hide.me/en/server-status
-sed -i 's/auth-user-pass/auth-user-pass \/etc\/openvpn\/credentials/g' /etc/openvpn/US-East.ovpn
-nohup openvpn --config /etc/openvpn/US-East.ovpn &
+sed -i 's/auth-user-pass/auth-user-pass \/etc\/openvpn\/credentials/g' /etc/openvpn/nl.hideservers.net.ovpn
+nohup openvpn --config /etc/openvpn/nl.hideservers.net.ovpn &
 ```
 
 ## reboot
