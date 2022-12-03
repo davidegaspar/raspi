@@ -1,4 +1,4 @@
-# Setup (Dec 2022)
+# Setup raspi (Dec 2022)
 
 ## 1. Install OS
 
@@ -17,6 +17,13 @@ arp -a # find device IP
 export RPI_HOSTNAME="..."
 ping $RPI_HOSTNAME.local
 ssh pi@$RPI_HOSTNAME.local
+```
+
+## 3. Update/Upgrade
+
+```sh
+sudo apt update
+sudo apt upgrade
 ```
 
 ## Reference

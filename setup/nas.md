@@ -1,13 +1,13 @@
 # NAS
 
-## install
+## 1. Install
 
-```
+```sh
 sudo apt-get update
 sudo apt install samba samba-common-bin
 ```
 
-## config
+## 2. Config
 
 ```
 mkdir -p /home/pi/chocobo
@@ -28,13 +28,9 @@ sudo smbpasswd -a pi
 sudo systemctl restart smbd
 ```
 
-## connect
+## 3. Verify
 
-```
-hostname -I
-```
-
-```
-smb://0.0.0.0/chocobo
-smb://raspberrypi.local/chocobo
+```sh
+# macOS (Finder > cmd+K)
+smb://$RPI_HOSTNAME.local/chocobo
 ```
