@@ -26,6 +26,12 @@ sudo apt update
 sudo apt upgrade
 ```
 
+## 4. Install packages
+
+```sh
+sudo apt-get install -y dnsutils git tree
+```
+
 ## Reference
 
 - [raspberrypi.com/documentation/computers/remote-access](https://www.raspberrypi.com/documentation/computers/remote-access.html#remote-access)
