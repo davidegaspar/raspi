@@ -17,6 +17,7 @@ sudo apt upgrade
 sudo apt install transmission-daemon
 sudo nano /etc/transmission-daemon/settings.json
 ```
+
 ```json
 "download-dir": "/home/pi/.../dwn",
 "incomplete-dir": "/home/pi/.../inc",
@@ -29,6 +30,7 @@ sudo nano /etc/transmission-daemon/settings.json
 ```
 sudo nano /etc/init.d/transmission-daemon
 ```
+
 ```
 USER=pi
 ```
@@ -36,6 +38,7 @@ USER=pi
 ```
 sudo nano /etc/systemd/system/multi-user.target.wants/transmission-daemon.service
 ```
+
 ```
 user=pi
 ```
@@ -52,6 +55,7 @@ sudo chown -R pi:pi /home/pi/.config/transmission-daemon/
 ```
 
 ### reload
+
 ```
 sudo systemctl reload transmission-daemon
 ```
@@ -69,6 +73,7 @@ hostname -I
 ## remote
 
 ## install
+
 ```
 sudo apt install transmission-remote
 ```
@@ -86,11 +91,13 @@ transmission-remote <ip>:9091 -l
 ```
 
 ### add
+
 ```
 transmission-remote <ip>:9091 -a https://.../download/1289266.torrent
 ```
 
 ### stop
+
 ```
 transmission-remote --exit
 ```

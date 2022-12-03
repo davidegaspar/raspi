@@ -1,6 +1,7 @@
 # other stuff (review)
 
 #### docker-compose (didn't work last time)
+
 ```
 sudo apt update
 sudo apt install -y python python-pip libffi-dev python-backports.ssl-match-hostname
@@ -8,12 +9,15 @@ sudo pip install docker-compose
 ```
 
 #### camera
+
 ```
 raspi-config
 ```
 
 #### nodejs
+
 https://nodejs.org/en/download/
+
 ```
 sudo su
 cd /opt
@@ -28,6 +32,7 @@ rm nodejs.tar.xz
 ```
 
 #### aws
+
 ```
 sudo apt-get install python-pip
 sudo pip install awscli --upgrade --user
@@ -36,6 +41,7 @@ aws --version
 ```
 
 #### docker
+
 ```
 # TBD
 ```

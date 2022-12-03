@@ -5,11 +5,13 @@
 - https://hide.me/en/vpnsetup/ubuntu/openvpn-command-line/
 
 ## setup
+
 ```sh
 sudo -s
 apt-get -y install openvpn
 sudo reboot
 ```
+
 ```sh
 touch /etc/openvpn/credentials
 printf '%s\n' 'username' 'password' > /etc/openvpn/credentials
@@ -22,10 +24,12 @@ nohup openvpn --config /etc/openvpn/nl.hideservers.net.ovpn &
 ## reboot
 
 ## verify
+
 ```sh
 # txt browser
 sudo apt-get install elinks
 ```
+
 ```sh
 # whats my ip
 sudo apt-get install dnsutils
