@@ -1,0 +1,9 @@
+services:
+  webdav:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8090:80"
+    volumes:
+      - ./data:/data/dav
+      - ./.htpasswd:/etc/nginx/.htpasswd:ro
