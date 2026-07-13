@@ -18,7 +18,7 @@ Usage:
     # Custom report path
     python3 verify_copy.py /Volumes/NewDisk /Volumes/OldDisk --report /tmp/results.txt
 
-    # Include OS junk files (.DS_Store, Thumbs.db, etc.)
+    # Include OS junk files (.DS_Store, ._* resource forks, etc.)
     python3 verify_copy.py /Volumes/NewDisk /Volumes/OldDisk --include-junk
 """
 import argparse
@@ -42,11 +42,11 @@ def format_bytes(n):
         n /= 1024
     return f"{n:.1f}PB"
 
-def iter_files(root, ignore_names):
+def iter_files(root, ignore_names, include_dotfiles=False):
     for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
         dirnames[:] = [d for d in dirnames if d not in ignore_names]
         for fn in filenames:
-            if fn in ignore_names:
+            if fn in ignore_names or (not include_dotfiles and fn.startswith('._')):
                 continue
             full = os.path.join(dirpath, fn)
             if os.path.islink(full):
@@ -80,7 +80,7 @@ def main():
                          "Faster on big media files; may produce false matches for files with "
                          "identical headers/footers but different content in the middle.")
     ap.add_argument('--report', default='missing_files.txt', help="Output file for missing/mismatched list")
-    ap.add_argument('--include-junk', action='store_true', help="Don't skip OS junk files (.DS_Store etc.)")
+    ap.add_argument('--include-junk', action='store_true', help="Don't skip OS junk files (.DS_Store, ._* resource forks, etc.)")
     args = ap.parse_args()
 
     for label, path in [("disk A", args.disk_a), ("disk B", args.disk_b)]:
@@ -97,7 +97,7 @@ def main():
     a_count = 0
     a_bytes = 0
     last_print = t0
-    for path, size in iter_files(args.disk_a, ignore):
+    for path, size in iter_files(args.disk_a, ignore, args.include_junk):
         a_by_size[size].append(path)
         a_count += 1
         a_bytes += size
@@ -108,7 +108,7 @@ def main():
     print(f"  {a_count} files, {format_bytes(a_bytes)}, {time.time()-t0:.1f}s")
 
     print(f"Scanning disk B (old): {args.disk_b}")
-    b_files = list(iter_files(args.disk_b, ignore))
+    b_files = list(iter_files(args.disk_b, ignore, args.include_junk))
     print(f"  {len(b_files)} files")
 
     hash_cache = {}
