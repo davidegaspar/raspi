@@ -45,16 +45,35 @@ No persistent state file and no distinct LED colour for manual vs automatic — 
 Current: 42.10 Target: 55.00 Freq 1.50 Automatic: True On: False
 ```
 
-Not enabled by default in the systemd service. To check:
+Not enabled by default in the systemd service. `install-service.sh` doesn't accept a `--verbose` flag (it only knows `--preempt`/`--noled`/`--nobutton`/`--on-threshold`/`--off-threshold`/`--low-temp`/`--high-temp`/`--delay`/`--brightness`/`--venv`/`--extended-colours` — anything else gets rejected), so add it via a systemd drop-in instead.
+
+`sudo systemctl edit pimoroni-fanshim.service` opens `$EDITOR` (often nano over SSH) on a temp file — easy to end up with an empty/broken override if the save sequence isn't followed exactly (`Ctrl+O`, `Enter`, `Ctrl+X` in nano) or if a long pasted line gets auto-wrapped by the terminal into extra broken lines. More reliable to write the drop-in directly, one short line at a time so nothing gets mangled on paste:
 
 ```bash
-sudo systemctl edit pimoroni-fanshim.service
-# [Service]
-# ExecStart=
-# ExecStart=/usr/bin/python3 /path/to/automatic.py --on-threshold 65 --off-threshold 55 --delay 2 --verbose
+sudo -i
+cd /etc/systemd/system/pimoroni-fanshim.service.d   # mkdir -p first if missing
+rm -f override.conf
+echo '[Service]' >> override.conf
+echo 'ExecStart=' >> override.conf
+echo 'ExecStart=/usr/bin/python3 -u \' >> override.conf
+echo '/path/to/automatic.py \' >> override.conf
+echo '--on-threshold 65 --off-threshold 55 \' >> override.conf
+echo '--delay 2 --verbose' >> override.conf
+cat -A override.conf   # every continuation line should end in \$ except the last
+```
 
-sudo systemctl daemon-reload
-sudo systemctl restart pimoroni-fanshim.service
+Notes:
+- `ExecStart=` (blank line) before the new `ExecStart=` is required — it clears the original command. Skipping it causes `Refusing... more than one ExecStart=` on restart.
+- `-u` forces unbuffered Python stdout — without it, `print()` output sits in a buffer and never reaches the journal.
+- Trailing `\` on continuation lines is systemd's own line-continuation syntax; without it you get `Missing '=', ignoring line` errors.
+
+Then:
+
+```bash
+systemctl daemon-reload
+systemctl restart pimoroni-fanshim.service
+systemctl cat pimoroni-fanshim.service   # confirm the merged unit looks right
+exit
 sudo journalctl -u pimoroni-fanshim.service -f
 ```
 
@@ -69,6 +88,28 @@ cat /sys/class/thermal/thermal_zone0/temp   # millidegrees — divide by 1000
 ## Why do the two temp commands differ by ~1°C?
 
 Normal, not a bug. Same physical sensor, two independent readers: `vcgencmd` asks the closed-source VideoCore firmware directly; `/sys/class/thermal/thermal_zone0/temp` comes from the Linux kernel's own thermal driver. Slightly different conversion algorithms from raw ADC value → temperature account for the gap.
+
+## Fan not starting after reboot — how to debug
+
+Work through these in order:
+
+1. **Is the service actually enabled and running?**
+   ```bash
+   sudo systemctl status pimoroni-fanshim.service
+   sudo systemctl is-enabled pimoroni-fanshim.service
+   sudo journalctl -u pimoroni-fanshim.service -b   # this boot's log only
+   ```
+   If `is-enabled` says `disabled`, that alone explains it — `sudo systemctl enable --now pimoroni-fanshim.service`.
+
+2. **Turn on `--verbose`** (see "How do I tell what mode it's in?" above) and watch the live log while temp is above the on-threshold:
+   ```bash
+   sudo journalctl -u pimoroni-fanshim.service -f
+   ```
+   Look for a line like `Current: 68.10 Target: 65.00 Freq 1.50 Automatic: True On: True`.
+
+3. **Split software vs. hardware based on what that line says:**
+   - `On: False` even though current temp is above the threshold → logic/config problem — double check the `--on-threshold`/`--off-threshold` values actually in the running `ExecStart` (`systemctl cat pimoroni-fanshim.service`), not just what you think you set.
+   - `On: True` but the fan doesn't physically spin → hardware problem, not software. Confirmed cause here: the fan ran fine once nudged by hand and stopped cleanly when the code turned it off — a worn/sealed hydraulic bearing that can't self-start from rest but works once moving. See "Fan spec (for replacement)" below.
 
 ## Fan spec (for replacement)
 
