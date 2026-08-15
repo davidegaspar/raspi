@@ -70,6 +70,22 @@ cat /sys/class/thermal/thermal_zone0/temp   # millidegrees — divide by 1000
 
 Normal, not a bug. Same physical sensor, two independent readers: `vcgencmd` asks the closed-source VideoCore firmware directly; `/sys/class/thermal/thermal_zone0/temp` comes from the Linux kernel's own thermal driver. Slightly different conversion algorithms from raw ADC value → temperature account for the gap.
 
+## Fan spec (for replacement)
+
+30mm 5V DC fan, sealed hydraulic bearing, 2-wire (no PWM/tach), JST PH2.0 connector — AVC DATA0307R5H-002 (or equivalent 3007 fan).
+
+| Spec | Value |
+|---|---|
+| Dimensions | 30 × 30 × 7mm |
+| Voltage | 5V DC |
+| Current | 0.13A |
+| Power | 0.65W |
+| Speed | ~7,200 RPM |
+| Bearing | Hydraulic (sealed — not lubricatable/serviceable) |
+| Wires | 2 (power/ground, no tach/PWM) |
+
+Symptom of a worn/failing bearing: fan runs fine once spinning and stops cleanly on command, but won't self-start from rest without a manual nudge. Not fixable (sealed bearing) — replace the fan.
+
 ## Battery drain — fan on vs off, hot vs cold
 
 Fan (AVC DATA0307R5H-002, per manufacturer spec):
