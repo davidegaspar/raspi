@@ -12,6 +12,14 @@ A normal SSH shell dies (SIGHUP) if the connection drops, killing anything runni
 sudo apt install tmux
 ```
 
+## "No server running"
+
+```
+error connecting to /tmp/tmux-1000/default (No such file or directory)
+```
+
+`tmux ls` prints this when no session exists yet — it's the normal empty state, not a fault. The socket is created by the first session and removed when the last one exits.
+
 ## Start a session
 
 ```bash
