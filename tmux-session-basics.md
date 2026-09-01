@@ -74,6 +74,32 @@ tmux new -s <new-name>
 
 tmux supports nesting this way — it drops you straight into the new session.
 
+## Scroll back
+
+`Ctrl-b [` enters copy mode, which is the only way to see anything above the visible screen.
+
+- `PgUp` / `PgDn`, or arrow keys, to move
+- `q` or `Esc` to leave copy mode and return to the live view
+- `Ctrl-r` searches backwards (emacs keys, the default); `?` if `mode-keys` is set to vi
+
+To scroll with the mouse wheel instead: `Ctrl-b :` then `set -g mouse on`.
+
+Scrollback is capped at 2000 lines per pane by default, so the start of a long-running job may already be gone. Raise it with `set -g history-limit 50000` (applies to panes created afterwards), or write the job's output to a log file and stop relying on scrollback.
+
+`Ctrl-b :` then `clear-history` drops a pane's scrollback without disturbing whatever is running in it.
+
+## How long a session lasts
+
+Sessions don't expire on a timer, and detaching doesn't start a clock — an idle session sits there indefinitely.
+
+A session ends when:
+
+- the last window's process exits (typing `exit` in the shell closes that window; closing the last one ends the session),
+- the machine reboots — sessions do **not** survive a reboot,
+- someone runs `tmux kill-session -t <name>` or `tmux kill-server`.
+
+The server process itself exits once the final session is gone, which is what removes the socket and makes `tmux ls` report "no server running" again.
+
 ## Read a session's output without attaching
 
 ```bash

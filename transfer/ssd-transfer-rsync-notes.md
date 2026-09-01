@@ -228,6 +228,7 @@ rsync -rlht --partial --modify-window=1 --timeout=60 \
 | Destination must mirror source exactly, including deletions | `--delete` — destructive, always `--dry-run` it first |
 | Source disk is failing and stalls | lower `--timeout`, then see bad sectors below |
 | Resuming a run that was interrupted | nothing — re-run the identical command |
+| Destination can't store the source's timestamps | `--size-only` — see "Files that never converge" |
 
 ### Trailing slash matters
 
@@ -253,7 +254,25 @@ Run it inside `tmux` (see `../tmux-session-basics.md`) so it survives a dropped 
 
 ### Monitoring a long run
 
-`--info=progress2` gives a single live line. Its percentage is unreliable early on, because rsync builds the file list incrementally while transferring; it converges as the run proceeds.
+`--info=progress2` gives a single live line:
+
+```
+3.47T  100%  3235028.75GB/s   0:00:00 (xfr#337582, to-chk=0/349478)
+```
+
+| Field | Reading it |
+|---|---|
+| Size | Bytes transferred so far. Monotonic — the only field that always moves forward, and the one to trust |
+| Percent | Bytes done ÷ total *known so far*, not the true total |
+| Time | ETA derived from that same partial total |
+| `xfr#` | Files transferred so far |
+| `to-chk=N/M` | `N` entries left to check, out of `M` discovered. `M` grows as scanning continues |
+
+**The percentage and ETA going backwards is normal**, not a fault. rsync uses incremental recursion — it builds the file list *while* transferring rather than scanning everything up front. Each time it discovers more files the denominator jumps, so the percentage drops and the ETA swings. Both settle once `M` in `to-chk` stops growing and the list is complete.
+
+The rate swings independently: large files push it up, directories of thousands of small files drag it down, because per-file overhead dominates there.
+
+A `--dry-run` beforehand gives the true totals, which lets you compute real progress as transferred ÷ dry-run size, ignoring the reported percentage entirely. On a dry run the rate itself is meaningless — no bytes move, so rsync divides the full size by a near-zero elapsed time, producing the absurd figure above.
 
 From a second tmux window (`Ctrl-b c` to create, `Ctrl-b n` to switch):
 
@@ -263,6 +282,69 @@ df -h /mnt/ssd            # destination filling up
 ```
 
 Detach the whole session with `Ctrl-b d` and the transfer keeps running.
+
+### Checking on it from elsewhere
+
+Snapshot the pane without attaching, from any other window or a fresh SSH connection (see `../tmux-session-basics.md`):
+
+```bash
+tmux capture-pane -t copy -p
+```
+
+Because `--info=progress2` redraws one line using carriage returns, a capture returns that line as it stands at that instant, not a history. For a record over time, `~/rsync.log` from `--log-file` is the source to read.
+
+Don't type into the pane running rsync — keystrokes go to its stdin, and `Ctrl-C` there kills the transfer. To clear a cluttered pane, `Ctrl-b :` then `clear-history` drops the scrollback without touching the running process; `Ctrl-l` does nothing, since rsync owns the foreground.
+
+## Confirming the copy is complete
+
+Re-run the same command with `--dry-run --stats` added. A complete copy reports **`Number of regular files transferred: 0`** — rsync finds nothing left to do. Anything above zero is a file that didn't land or doesn't match.
+
+Keep `--modify-window=1` in the check. Without it every file on an exFAT destination looks changed and the result is meaningless.
+
+To see *why* each straggler differs, add `-i` (`--itemize-changes`):
+
+```bash
+rsync -rlht --modify-window=1 --dry-run -i /mnt/src/ /mnt/ssd/ | head -50
+```
+
+| Code | Meaning | Action |
+|---|---|---|
+| `>f+++++++++` | Missing on the destination entirely | Re-run the real command; these copy normally |
+| `>f.st......` | Size *and* time differ — truncated or partial | Re-run the real command |
+| `>f..t......` | Content matches, only the mtime differs | Re-runs won't fix it — see below |
+
+Also check what failed during the run itself:
+
+```bash
+grep -iE 'error|failed|cannot' ~/rsync.log | head -30
+```
+
+### Files that never converge
+
+A `>f..t......` file that survives a second pass means the destination cannot store the timestamp rsync writes. It reads back different, so the file is "changed" on every run, forever. Re-running is pointless — diagnose it instead:
+
+```bash
+f=path/relative/to/the/mount/file.jpg
+stat -c '%y %s' /mnt/src/"$f" /mnt/ssd/"$f"
+```
+
+Compare the two timestamps:
+
+- **Source before 1980-01-01, destination exactly 1980-01-01** — the FAT epoch. exFAT cannot represent any date earlier than 1980, so the driver clamps it, leaving a permanent 1-day-or-more gap. No flag changes this. Count how many files are affected with `find /mnt/src -type f ! -newermt '1980-01-01' | wc -l`; if that matches the number rsync keeps reporting, every straggler is this case and the data is fine.
+- **A gap of exactly one hour, or your UTC offset** — the exfat driver's timezone handling. exFAT stores local time plus an offset field, and a disk written by macOS or Windows can disagree with Linux about it. Fix at mount time with the `time_offset=<minutes>` option rather than widening the window.
+- **1–2 seconds** — exFAT's 2-second granularity, one short of what `--modify-window=1` absorbs. Use `--modify-window=2`.
+
+Equal sizes plus `cmp /mnt/src/"$f" /mnt/ssd/"$f"` returning silently proves the content copied correctly and only the recorded mtime differs — cosmetic, not data loss.
+
+Two other things exFAT simply cannot store, which fail permanently the same way: **illegal characters** in names (`: * ? " < > | \`), common on ext4 and NTFS sources, and **symlinks**, which have no exFAT representation at all despite `-l`.
+
+Once the remainder is understood and benign, close out on content instead of time:
+
+```bash
+rsync -rlh --size-only --dry-run --stats /mnt/src/ /mnt/ssd/     # expect 0 transferred
+```
+
+Keep `--size-only` in any future sync to this disk, or those files re-copy on every run — harmless, but they bury genuinely changed files in the output.
 
 ## Handling read errors (bad sectors)
 
