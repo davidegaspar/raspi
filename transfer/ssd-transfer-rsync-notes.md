@@ -173,6 +173,23 @@ If it reports "target is busy", find what's holding it open — usually a shell 
 sudo lsof +f -- /mnt/ssd
 ```
 
+Confirm nothing is still mounted before unplugging anything:
+
+```bash
+lsblk -o NAME,SIZE,FSTYPE,LABEL,MOUNTPOINTS   # MOUNTPOINTS empty for every partition
+findmnt /mnt/ssd                              # no output, exit 1 = not mounted
+```
+
+A successful `umount` has already flushed the cache — it syncs before releasing the filesystem, so there's no window where a disk is unmounted but still writing. The explicit `sync` above is belt-and-braces.
+
+Optionally spin the drive down before pulling the cable, which parks the heads on a spinning disk:
+
+```bash
+sudo udisksctl power-off -b /dev/sda
+```
+
+The device disappears from `lsblk` afterwards — that absence is the confirmation.
+
 ### Before starting the copy
 
 Confirm the destination is genuinely writable — an exFAT volume mounted without `uid`/`umask` is root-owned and will fail partway in:

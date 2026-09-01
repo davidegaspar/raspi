@@ -33,7 +33,7 @@ Per-project docs (live beside the code they describe):
 | File | Covers |
 | --- | --- |
 | `transfer/readme.md` | Index of the three copy/verify docs and the `verify_copy.py` invocation |
-| `transfer/ssd-transfer-rsync-notes.md` | End-to-end external USB disk workflow: identify (incl. the Mac EFI partition), disk-to-disk power budget and read-only source mounting, wipe/format as exFAT, mount + fstab with `uid`/`umask`/`nofail`, one canonical rsync command plus situational flags, idempotency via `-t` + `--modify-window=1`, reading `--info=progress2` and snapshotting the run with `capture-pane`, confirming completeness with `-i` itemize codes, files that never converge (FAT epoch, timezone offset, illegal names, symlinks), bad sectors, verification, slow-transfer diagnosis |
+| `transfer/ssd-transfer-rsync-notes.md` | End-to-end external USB disk workflow: identify (incl. the Mac EFI partition), disk-to-disk power budget and read-only source mounting, wipe/format as exFAT, mount + fstab with `uid`/`umask`/`nofail`, safe unmount and confirming it, one canonical rsync command plus situational flags, idempotency via `-t` + `--modify-window=1`, reading `--info=progress2` and snapshotting the run with `capture-pane`, confirming completeness with `-i` itemize codes, files that never converge (FAT epoch, timezone offset, illegal names, symlinks), bad sectors, verification, slow-transfer diagnosis |
 | `transfer/copy-verification-methods.md` | Four escalating checks that a copy is complete: filenames, per-file sizes, apparent-size totals, `rsync -c` |
 | `webdav/README.md` | Overview + file map for the Dockerized WebDAV server |
 | `webdav/docs/docker-install-raspi.md` | Installing Docker on Pi 4 (incl. cleaning broken apt sources) |
