@@ -6,12 +6,25 @@ Notes from moving large files onto a USB-connected external disk using a Pi — 
 
 ## Identifying the disk
 
+`lsblk` and `blkid` are Linux-only — on a Mac use `diskutil` instead. Device names differ too: the same disk is `/dev/sda` on the Pi and `/dev/diskN` on the Mac.
+
+**On the Pi (Linux):**
+
 ```bash
 lsblk -o NAME,SIZE,FSTYPE,LABEL,MOUNTPOINTS   # tree of disks and partitions
 sudo blkid /dev/sda1                          # UUID, label, filesystem type
 ```
 
-`sda`/`sdb` are USB disks; `mmcblk0` is the onboard SD card. Confirm the size matches the disk you mean before running anything destructive — device letters are assigned in probe order and can move between boots.
+**On the Mac (macOS):**
+
+```bash
+diskutil list external        # external disks only, e.g. /dev/disk4 with partitions disk4s1, disk4s2
+diskutil info /dev/disk4      # size, model, filesystem, UUID — confirm it's the right disk
+```
+
+`/dev/disk0` and the other internal disks are the Mac itself. macOS renumbers external disks as they're attached, so re-run `diskutil list` right before any destructive command.
+
+On the Pi, `sda`/`sdb` are USB disks; `mmcblk0` is the onboard SD card. Confirm the size matches the disk you mean before running anything destructive — device letters are assigned in probe order and can move between boots.
 
 A disk that was formatted on a Mac shows **two** partitions: a 200MB `vfat` one labelled `EFI`, plus the real data partition. macOS Disk Utility writes an EFI System Partition onto every GPT disk it initialises, even a data-only drive that will never boot. It's empty and harmless — but it means the data lives on partition **2**, so mount `sdb2`, not `sdb1`. A disk partitioned on Linux with `parted` (below) has just the one partition.
 
@@ -34,7 +47,9 @@ That works as-is for ext4 and exFAT. For an **NTFS** source, install `ntfs-3g` f
 
 ## Wiping and formatting as exFAT
 
-> **Destructive.** Every command in this section erases data, with no confirmation prompt and no undo. Re-check the device with `lsblk` immediately before each one.
+> **Destructive.** Every command in this section erases data, with no confirmation prompt and no undo. Re-check the device with `lsblk` (Pi) or `diskutil list` (Mac) immediately before each one.
+
+Either machine can do it: steps 1–5 below run **on the Pi**; to do it **on the Mac** in one command, see "Formatting from macOS instead".
 
 Install the tools (`exfatprogs` provides `mkfs.exfat` and `fsck.exfat`; the kernel handles mounting on its own):
 
@@ -97,12 +112,18 @@ Worth running after any unclean removal — exFAT has no journal, so a disk yank
 
 ### Formatting from macOS instead
 
+**On the Mac (macOS)** — `diskutil eraseDisk` replaces all five Pi steps (unmount, wipe, partition, format) in one command:
+
 ```bash
-diskutil list                                        # find the disk identifier
+diskutil list external                               # find the disk identifier
+diskutil info /dev/disk4                             # confirm size/model
 diskutil eraseDisk ExFAT MyDisk GPT /dev/disk4       # erases the WHOLE disk
+diskutil eject /dev/disk4                            # flush and detach before unplugging
 ```
 
 Use `/dev/diskN` (the whole disk), not `/dev/diskNsM` (a partition), and double-check the identifier — macOS renumbers disks as they're attached.
+
+A GPT disk formatted this way gets the extra 200MB `EFI` partition described under "Identifying the disk", so on the Pi the data partition is `sdX2`, not `sdX1`.
 
 ## Mounting
 
@@ -162,33 +183,51 @@ findmnt /mnt/ssd            # confirm options took effect
 
 exFAT writes are buffered; pulling the cable before the cache flushes is what corrupts these disks.
 
+**On the Pi (Linux):**
+
 ```bash
 sync                        # flush pending writes
 sudo umount /mnt/ssd
 ```
 
-If it reports "target is busy", find what's holding it open — usually a shell sitting in the directory:
+**On the Mac (macOS):**
 
 ```bash
-sudo lsof +f -- /mnt/ssd
+diskutil unmount /Volumes/MyDisk     # one volume
+diskutil unmountDisk /dev/disk4      # every volume on the disk, incl. the EFI partition
 ```
+
+If it reports "target is busy" (Pi) or "Unmount failed / in use" (Mac), find what's holding it open — usually a shell sitting in the directory:
+
+```bash
+sudo lsof +f -- /mnt/ssd             # Pi
+sudo lsof /Volumes/MyDisk            # Mac — given a mount point, lists every open file on that volume
+```
+
+On the Mac, Spotlight (`mds`) indexing a newly attached disk is a common culprit. `diskutil unmount force` exists but drops whatever the holder was writing — close the process instead.
 
 Confirm nothing is still mounted before unplugging anything:
 
 ```bash
+# Pi
 lsblk -o NAME,SIZE,FSTYPE,LABEL,MOUNTPOINTS   # MOUNTPOINTS empty for every partition
 findmnt /mnt/ssd                              # no output, exit 1 = not mounted
+
+# Mac
+mount | grep /Volumes/MyDisk                  # no output = not mounted
+diskutil list external                        # disk still listed, but no volume mounted
 ```
 
-A successful `umount` has already flushed the cache — it syncs before releasing the filesystem, so there's no window where a disk is unmounted but still writing. The explicit `sync` above is belt-and-braces.
+A successful `umount` / `diskutil unmount` has already flushed the cache — both sync before releasing the filesystem, so there's no window where a disk is unmounted but still writing. The explicit `sync` above is belt-and-braces.
 
-Optionally spin the drive down before pulling the cable, which parks the heads on a spinning disk:
+Optionally power the drive down before pulling the cable, which parks the heads on a spinning disk:
 
 ```bash
-sudo udisksctl power-off -b /dev/sda
+sudo udisksctl power-off -b /dev/sda          # Pi
+diskutil eject /dev/disk4                     # Mac — unmounts everything first if needed, then detaches
 ```
 
-The device disappears from `lsblk` afterwards — that absence is the confirmation.
+The device disappears from `lsblk` (Pi) or `diskutil list` (Mac) afterwards — that absence is the confirmation.
 
 ### Before starting the copy
 
@@ -251,6 +290,22 @@ rsync -rlht --partial --modify-window=1 --timeout=60 \
 
 - `rsync ... /mnt/src/ /mnt/ssd/` — copies the *contents* of `src` into `ssd`.
 - `rsync ... /mnt/src /mnt/ssd/` — copies `src` itself, nested as `/mnt/ssd/src/`.
+
+### Disk-to-disk on the Mac instead
+
+**On the Mac (macOS)** — with both disks attached, they mount under `/Volumes` automatically (`ls /Volumes` for the real names), so there's nothing to mount:
+
+```bash
+caffeinate -i rsync -rlht --partial --modify-window=1 --progress \
+  "/Volumes/OldDisk/MyFolder" "/Volumes/NewDisk/"
+```
+
+- Copy only: the source is just read, and with no `--delete` nothing on the destination is removed. A destination file at the same path that differs *is* overwritten.
+- `caffeinate -i` keeps the Mac from sleeping mid-copy. Quote the paths — volume names often contain spaces.
+- `--progress` instead of `--info=progress2`: `/usr/bin/rsync` on recent macOS is Apple's `openrsync` ("rsync version 2.6.9 compatible"), which accepts the flags above but not every modern one. If a flag is rejected, or a second run recopies everything instead of listing nothing, `brew install rsync` for the full version.
+- Spotlight indexing a freshly formatted disk slows the copy; `sudo mdutil -i off /Volumes/NewDisk` stops it.
+
+Verify afterwards with `verify_copy.py` (destination first): `caffeinate -i python3 verify_copy.py /Volumes/NewDisk/MyFolder /Volumes/OldDisk/MyFolder`.
 
 ## Resuming / idempotency
 
