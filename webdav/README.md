@@ -9,6 +9,7 @@ Lightweight WebDAV server for Raspberry Pi 4, running in Docker using a custom `
 | `Dockerfile`         | Builds nginx:alpine with WebDAV extension |
 | `nginx.conf`         | WebDAV server configuration               |
 | `docker-compose.yml` | Container definition                      |
+| `deploy.sh`          | Copies files to the Pi and clean-rebuilds |
 | `.gitignore`         | Excludes credentials and data from git    |
 
 ## Setup guides

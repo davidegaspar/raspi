@@ -18,6 +18,7 @@ raspi-webdav/
 ├── Dockerfile             ← deploy to Pi
 ├── nginx.conf             ← deploy to Pi
 ├── docker-compose.yml     ← deploy to Pi
+├── deploy.sh              ← run on Mac to redeploy
 └── docs/
     ├── docker-install-raspi.md
     └── webdav-docker.md
@@ -92,7 +93,7 @@ docker compose logs -f
 docker compose exec webdav cat /etc/nginx/nginx.conf
 ```
 
-Confirm `user www-data;` and `client_body_temp_path` are present. If not, the old cached image is still running — repeat the clean build above.
+Confirm `user www-data;`, `client_body_temp_path` and `client_max_body_size` are present. If not, the old cached image is still running — repeat the clean build above.
 
 ## 6. Test
 
@@ -112,15 +113,16 @@ A directory listing in the response confirms WebDAV is working.
 
 ## Redeploying after changes
 
-After updating any file on your Mac, always force a clean rebuild:
+After updating any file on your Mac, run from `webdav/`:
 
 ```bash
-scp Dockerfile nginx.conf docker-compose.yml <user>@<pi-ip>:~/webdav/
-ssh <user>@<pi-ip> "cd ~/webdav && docker compose down && docker compose build --no-cache && docker compose up -d"
+./deploy.sh <user>@<pi-ip>
 ```
 
+It copies `Dockerfile`, `nginx.conf` and `docker-compose.yml` to `~/webdav/` on the Pi, runs `down` → `build --no-cache` → `up -d`, then diffs the config inside the running container against your local `nginx.conf` and exits non-zero on a mismatch.
+
 > [!WARNING]
-> `docker compose up -d --build` can silently use cached layers and miss config changes. Always use `--no-cache` after editing `nginx.conf` or `Dockerfile`.
+> `docker compose up -d --build` can silently use cached layers and miss config changes. That's why the script always uses `--no-cache`.
 
 ## Super Productivity sync settings
 

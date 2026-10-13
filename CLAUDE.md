@@ -71,7 +71,7 @@ caffeinate -i python3 verify_copy.py ...                            # prevent di
 
 It is strictly read-only, matches by content rather than path (so reorganized folders still verify), groups disk A by file size before hashing to avoid hashing anything unnecessarily, and writes unmatched files to `missing_files.txt`. Preserve the read-only property in any change.
 
-WebDAV server (on the Pi, from `webdav/`): `docker compose up -d --build`. `.htpasswd` and `data/` are deliberately untracked and must stay that way; the service is meant to be reachable over Tailscale only, never port-forwarded.
+WebDAV server: from `webdav/` on the Mac, `./deploy.sh <user>@<pi-ip>` copies the files to the Pi, does a `--no-cache` rebuild (plain `up -d --build` can miss `nginx.conf` changes), and checks the running config matches. `.htpasswd` and `data/` are deliberately untracked and must stay that way; the service is meant to be reachable over Tailscale only, never port-forwarded.
 
 ## Conventions
 
